@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+src/blood_testing/__init__.py
+src/blood_testing/generate_descriptions.py
+src/blood_testing.egg-info/PKG-INFO
+src/blood_testing.egg-info/SOURCES.txt
+src/blood_testing.egg-info/dependency_links.txt
+src/blood_testing.egg-info/entry_points.txt
+src/blood_testing.egg-info/requires.txt
+src/blood_testing.egg-info/top_level.txt

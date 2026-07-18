@@ -1,0 +1,2 @@
+[console_scripts]
+blood-testing = blood_testing.generate_descriptions:main
