@@ -23,6 +23,12 @@ DEFAULT_API_KEY = "ollama"
 MAX_JSON_RETRIES = 2
 
 
+def build_timestamped_output_path(output_path: Path) -> Path:
+    """Return a new output path with a timestamp suffix so each run creates a fresh file."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return output_path.with_name(f"{output_path.stem}_{timestamp}{output_path.suffix}")
+
+
 def build_client(base_url: str = DEFAULT_BASE_URL, api_key: str = DEFAULT_API_KEY) -> OpenAI:
     """Initialize the local OpenAI-compatible Ollama client."""
     return OpenAI(base_url=base_url, api_key=api_key)
@@ -93,6 +99,7 @@ def process_text_catalog(
     """
     input_path = Path(input_text_path)
     output_path = Path(output_text_path)
+    output_path = build_timestamped_output_path(output_path)
 
     if not input_path.exists():
         raise FileNotFoundError(f"Could not find input file '{input_path}'")
@@ -172,6 +179,7 @@ def process_catalog(
     """Generate descriptions for each test in an Excel catalog file."""
     input_path = Path(input_excel_path)
     output_path = Path(output_excel_path)
+    output_path = build_timestamped_output_path(output_path)
 
     if not input_path.exists():
         raise FileNotFoundError(f"Could not find input file '{input_path}'")
