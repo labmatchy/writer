@@ -4,65 +4,99 @@ This project generates `short_description` and `clinical_overview` text for lab 
 
 ## What it does
 
-- Reads an Excel catalog file
-- Uses `test_name` as the input label
+- Reads a text file of test names (one per line)
 - Calls a local Ollama model through the OpenAI-compatible API
-- Writes the generated text back into the workbook as new columns
+- Writes the generated text to a CSV with `test_name`, `short_description`, and `clinical_overview`
 
 ## Project layout
 
+- `run.sh` — one-command runner (checks environment, installs only what's missing, then generates)
 - `src/blood_testing/generate_descriptions.py` — main generation logic
+- `input/testnames.txt` — default input list of test names
+- `output/` — generated CSV output
 - `requirements.txt` — Python dependencies
-- `pyproject.toml` — optional project metadata and CLI configuration
+- `pyproject.toml` — project metadata and CLI configuration
 
 ## Quick start
 
-1. Create and activate a virtual environment:
+### Default run
 
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+From the repo root, just run:
 
-2. Install dependencies:
+```bash
+./run.sh
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+With no arguments it uses:
 
-3. Install and run Ollama locally:
+| Flag | Default |
+|------|---------|
+| `--input` | `input/testnames.txt` |
+| `--output` | `output/lab_test_descriptions.csv` |
+| `--model` | `gemma4:latest` |
 
-   ```bash
-   brew install ollama
-   ollama pull gemma4:12b
-   ollama serve
-   ```
+The script checks Python, the virtualenv, dependencies, and Ollama first, then generates a timestamped CSV under `output/` (for example `lab_test_descriptions_20260717_223000.csv`).
 
-4. Put your input workbook next to the repo root, for example:
+### Custom input and output
 
-   ```bash
-   tests_catalog.xlsx
-   ```
+Pass your own paths when you need them:
 
-5. Run the generator:
+```bash
+./run.sh --input path/to/my_tests.txt --output output/my_results.csv
+```
 
-   ```bash
-   python -m blood_testing.generate_descriptions \
-     --input tests_catalog.xlsx \
-     --output tests_catalog_completed.xlsx
-   ```
+You can also change the model:
 
-## Expected Excel input
+```bash
+./run.sh --model gemma4:latest
+```
 
-Your workbook should contain a column named `test_name`.
+Or combine all three:
 
-The script will add these output columns:
+```bash
+./run.sh \
+  --input path/to/my_tests.txt \
+  --output output/my_results.csv \
+  --model gemma4:latest
+```
 
+## Expected input
+
+`input/testnames.txt` should look like:
+
+```text
+Test Name
+CBC
+CMP
+TSH
+A1C
+```
+
+## Output columns
+
+The CSV will contain:
+
+- `test_name`
 - `short_description`
 - `clinical_overview`
 
+## Manual run (optional)
+
+If you prefer to manage the environment yourself:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+python -m blood_testing \
+  --input input/testnames.txt \
+  --output output/lab_test_descriptions.csv
+```
+
 ## Notes
 
-- The default model is `gemma4:12b`
+- The default model is `gemma4:latest`
 - The script uses the local HTTP endpoint at `http://localhost:11434/v1`
 - Progress is reported with a tqdm progress bar
+- Each run writes a timestamped CSV plus a matching `.metadata.txt` file
